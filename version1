@@ -3,15 +3,49 @@
 #include <time.h>
 #include <Windows.h>
 
-void atualizarMatrizX(int linha, int coluna, char matriz[][5]){
-    matriz[linha][coluna] = 'X';
+void atualizarMatriz(int linha, int coluna, char matriz[5][5], char letra){
+    matriz[linha][coluna] = letra;
 }
-void atualizarMatrizO(char **matriz){
-    int random;
-    srand(time(NULL));
-    random = rand();
+
+
+void printarMatriz(char matriz[5][5]){
+    for (int i=0;i<5;i++){
+        for(int j=0;j<5;j++){
+            printf("%c", matriz[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
 }
+
+int conferirLugar(int linha, int coluna, char matriz[5][5]){
+    if (matriz[linha][coluna] == 'X' || matriz[linha][coluna] == 'O'){
+        return 0;
+    }
+    else{
+        return 1;
+    }
+}
+
+int conferirVitoria(char jogador, char matriz[5][5]) {
+
+    for (int i = 0; i < 3; i++) {
+        if (matriz[i][0] == jogador && matriz[i][2] == jogador && matriz[i][4] == jogador)
+            return 1; 
+        if (matriz[0][i] == jogador && matriz[2][i] == jogador && matriz[4][i] == jogador)
+            return 1; 
+    }
+    // Verificar diagonais
+    if ((matriz[0][0] == jogador && matriz[2][2] == jogador && matriz[4][4] == jogador) || (matriz[0][4] == jogador && matriz[2][2] == jogador && matriz[4][0] == jogador))
+        return 1; 
+
+    return 0;
+}
+
 int main(){
+    int linha, coluna, saida, contX = 0, contO = 0, cont = 0;
+    char letra = 'X';
+
     printf("Jogo da velha!\n\n");
     char matriz[5][5] = {
         {' ', -77, ' ', -77, ' '}, 
@@ -20,30 +54,38 @@ int main(){
         {-60, -59, -60, -59, -60}, 
         {' ', -77, ' ', -77, ' '}  
     };
-
     for (int i=0;i<5;i++){
         for(int j=0;j<5;j++){
             printf("%c", matriz[i][j]);
         }
         printf("\n");
     }
-    atualizarMatrizX(0,0,matriz);
 
-    system("cls");
-    for (int i=0;i<5;i++){
-        for(int j=0;j<5;j++){
-            printf("%c", matriz[i][j]);
+    while(cont < 9){
+        printf("Escolha o numero da linha: ");
+        scanf("%i", &linha);
+        printf("Escolha o numero da coluna: ");
+        scanf("%i", &coluna);
+        linha = (linha-1)*2;
+        coluna = (coluna-1)*2;
+        // saida = conferirLugar(linha, coluna, matriz);
+        if(matriz[linha][coluna] != ' '){
+            printf("Posicao ocupada!\n");
+            continue;
         }
-        printf("\n");
+        
+        atualizarMatriz(linha,coluna,matriz,letra);
+        printarMatriz(matriz);
+        int resultado = conferirVitoria(letra,matriz);
+        if(resultado == 1){
+            printf("Jogador %c ganhou!", letra);
+            return 0;
+        }    
+        
+
+        letra = (letra=='X') ? 'O':'X';
+        cont++;
     }
+    printf("Empate");
     return 0;
 }
-// X | O | X
-// --+---+---
-// X | O | X
-// ----------
-// X | O | X
-
-// ┼ -59
-// ─ -60
-// │ -77
